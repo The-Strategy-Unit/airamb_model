@@ -2,6 +2,7 @@ import random
 
 import pandas as pd
 import simpy
+
 from airamb_model.entity import Emergency_Job
 
 
@@ -14,7 +15,7 @@ class g:
     probability_of_stand_down = 0.2
     number_of_air_ambulances = 3
     sim_duration = 1000
-    number_of_runs = 20
+    number_of_runs = 2
 
 
 class Model:
@@ -83,7 +84,7 @@ class Model:
 
             # first we'll check if the job was stood down on route
             if random.random() < g.probability_of_stand_down:
-                job_cycle_time = random.expovariate(
+                job.job_cycle_time = random.expovariate(
                     1.0 / g.mean_job_cycle_time_stood_down
                 )
                 job.job_stood_down = True
@@ -92,16 +93,16 @@ class Model:
             else:
                 job.job_stood_down = False
                 if random.random() < g.probability_of_conveyance:
-                    job_cycle_time = random.expovariate(
+                    job.job_cycle_time = random.expovariate(
                         1.0 / g.mean_job_cycle_time_conveyance
                     )
                     job.patient_conveyed = True
                 else:
-                    job_cycle_time = random.expovariate(1.0 / g.mean_job_cycle_time)
+                    job.job_cycle_time = random.expovariate(1.0 / g.mean_job_cycle_time)
                     job.patient_conveyed = False
 
             # freeze this process for the amount of time we just calculated, to simulate the time it takes to carry out the emergency job.
-            yield self.env.timeout(job_cycle_time)
+            yield self.env.timeout(job.job_cycle_time)
 
             # finally, we'll add a row to our results DataFrame with the results of this emergency job.
             self.results_df.loc[job.job_id] = [
@@ -124,6 +125,9 @@ class Model:
 
         # run the simulation for the duration we set in the g class
         self.env.run(until=g.sim_duration)
+
+        # after the simulation is complete, we want to calculate our metrics of choice
+        self.calculate_run_results()
 
         # Print the run number with the job-level results from this run of the model
         print(f"Run Number {self.run_number}")
