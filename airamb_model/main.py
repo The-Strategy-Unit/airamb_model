@@ -13,3 +13,7 @@ def main():
     my_trial.run_trial()
 
     print("Trial completed")
+
+
+if __name__ == "__main__":
+    main()
