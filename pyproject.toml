@@ -1,0 +1,13 @@
+[project]
+name = "airamb-model"
+version = "0.1.0"
+description = "Air Ambulance Model - A Python package for modeling air ambulance operations."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pandas>=2.3.1",
+    "simpy>=4.1.1",
+]
+
+[tool.setuptools]
+packages = ["airamb_model"]
